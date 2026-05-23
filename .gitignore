@@ -1,0 +1,34 @@
+# --- OpenFreezeCenter Improved Gitignore ---
+
+# Hardware Configuration (MUST NOT BE COMMITTED)
+config.py
+
+# Python Bytecode and Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# System / OS Files
+.DS_Store
+Thumbs.db
+
+# Logs and Process Outputs
+*.log
+nohup.out
+
+# Local Tooling & IDE Metadata
+.commandcode/
+.antigravitycli/
+.idea/
+.vscode/
+*.swp
+*.swo

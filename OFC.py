@@ -96,9 +96,8 @@ except FileNotFoundError:
 	LINE_NO = "PROFILE = 1\nAUTO_SPEED = [["+str(read(0x72, 1, 0))+", "+str(read(0x73, 1, 0))+", "+str(read(0x74, 1, 0))+", "+str(read(0x75, 1, 0))+", "+str(read(0x76, 1, 0))+", "+str(read(0x77, 1, 0))+", "+str(read(0x78, 1, 0))+"], ["+str(read(0x8a, 1, 0))+", "+str(read(0x8b, 1, 0))+", "+str(read(0x8c, 1, 0))+", "+str(read(0x8d, 1, 0))+", "+str(read(0x8e, 1, 0))+", "+str(read(0x8f, 1, 0))+", "+str(read(0x90, 1, 0))+"]]"
 	CONFIG.append(create_dialog("Auto Profile Selection", CHOICE, LINE_YES, LINE_NO, 300, 150, 1))
 
-	CHOICE = "\nIs your CPU intel 10th Gen and above\n"
-	LINE_YES = "\nADV_SPEED =  [[0, 40, 48, 56, 64, 72, 80], [0, 48, 56, 64, 72, 79, 86]] # Edit this list for ADVANCED FAN SPEEDS first the CPU speeds the GPU speeds\nBASIC_OFFSET = 0 # Edit this for a offset of fan speeds from AUTO SPEEDS from -30 to 30\nCPU = 1\nAUTO_ADV_VALUES = [0xd4, 13, 141]\nCOOLER_BOOSTER_OFF_ON_VALUES = [0x98, 2, 130]\nCPU_GPU_FAN_SPEED_ADDRESS = [[0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78], [0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90]]\nCPU_GPU_TEMP_ADDRESS = [0x68, 0x80]\nCPU_GPU_RPM_ADDRESS = [0xc8, 0xca]\nBATTERY_THRESHOLD_VALUE = 100 # Edit this value from between 50 to 100 for the percentage your battery will charge upto"
-	LINE_NO =  "\nADV_SPEED =  [[0, 40, 48, 56, 64, 72, 80], [0, 48, 56, 64, 72, 79, 86]] # Edit this list for ADVANCED FAN SPEEDS first the CPU speeds the GPU speeds\nBASIC_OFFSET = 0 # Edit this for a offset of fan speeds from AUTO SPEEDS from -30 to 30\nCPU = 0\nAUTO_ADV_VALUES = [0xf4, 12, 140]\nCOOLER_BOOSTER_OFF_ON_VALUES = [0x98, 0, 128]\nCPU_GPU_FAN_SPEED_ADDRESS = [[0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78], [0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90]]\nCPU_GPU_TEMP_ADDRESS = [0x68, 0x80]\nCPU_GPU_RPM_ADDRESS = [0xc8, 0xca]\nBATTERY_THRESHOLD_VALUE = 100 # Edit this value from between 50 to 100 for the percentage your battery will charge upto"
+	LINE_YES = "\nADV_SPEED =  [[0, 40, 48, 56, 64, 72, 80], [0, 48, 56, 64, 72, 79, 86]] # Edit this list for ADVANCED FAN SPEEDS first the CPU speeds the GPU speeds\nBASIC_OFFSET = 0 # Edit this for a offset of fan speeds from AUTO SPEEDS from -30 to 30\nCPU = 1\nAUTO_ADV_VALUES = [0xd4, 13, 141]\nCOOLER_BOOSTER_OFF_ON_VALUES = [0x98, 2, 130]\nCPU_GPU_FAN_SPEED_ADDRESS = [[0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78], [0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90]]\nCPU_GPU_TEMP_ADDRESS = [0x68, 0x80]\nCPU_GPU_RPM_ADDRESS = [0xc8, 0xca]\nBATTERY_THRESHOLD_VALUE = 100 # Edit this value from between 50 to 100 for the percentage your battery will charge upto\nPIN_TO_TRAY = True"
+	LINE_NO =  "\nADV_SPEED =  [[0, 40, 48, 56, 64, 72, 80], [0, 48, 56, 64, 72, 79, 86]] # Edit this list for ADVANCED FAN SPEEDS first the CPU speeds the GPU speeds\nBASIC_OFFSET = 0 # Edit this for a offset of fan speeds from AUTO SPEEDS from -30 to 30\nCPU = 0\nAUTO_ADV_VALUES = [0xf4, 12, 140]\nCOOLER_BOOSTER_OFF_ON_VALUES = [0x98, 0, 128]\nCPU_GPU_FAN_SPEED_ADDRESS = [[0x72, 0x73, 0x74, 0x75, 0x76, 0x77, 0x78], [0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f, 0x90]]\nCPU_GPU_TEMP_ADDRESS = [0x68, 0x80]\nCPU_GPU_RPM_ADDRESS = [0xc8, 0xca]\nBATTERY_THRESHOLD_VALUE = 100 # Edit this value from between 50 to 100 for the percentage your battery will charge upto\nPIN_TO_TRAY = True"
 	CONFIG.append(create_dialog("CPU Gen Selection", CHOICE, LINE_YES, LINE_NO, 300, 50, 1))
 
 	CONFIG_FILE = open(PATH_TO_CONFIG, "w")
@@ -128,6 +127,7 @@ def config_writer():
     CONFIG = CONFIG + ("\nCPU_GPU_TEMP_ADDRESS = " + str(config.CPU_GPU_TEMP_ADDRESS))
     CONFIG = CONFIG + ("\nCPU_GPU_RPM_ADDRESS = " + str(config.CPU_GPU_RPM_ADDRESS))
     CONFIG = CONFIG + ("\nBATTERY_THRESHOLD_VALUE = " + str(config.BATTERY_THRESHOLD_VALUE))
+    CONFIG = CONFIG + ("\nPIN_TO_TRAY = " + str(getattr(config, 'PIN_TO_TRAY', True)))
 
     CONFIG_FILE = open(PATH_TO_CONFIG, "w")
     CONFIG_FILE.writelines(CONFIG)
@@ -233,11 +233,12 @@ def update_label():
 class ParentWindow(Gtk.Window):
 	def __init__(self):
 		Gtk.Window.__init__(self, title = "Open Freeze Center (OFC)")
-		self.set_default_size(300, 190)
+		self.set_default_size(300, 230)
 		fixed = Gtk.Fixed()
 		self.add(fixed)
 
 		profile_selector = Gtk.ComboBox()
+		self.profile_selector = profile_selector
 		profile_list = Gtk.ListStore(str)
 		profile_list.append(["Auto"])
 		profile_list.append(["Basic"])
@@ -247,8 +248,8 @@ class ParentWindow(Gtk.Window):
 		cell_renderer = Gtk.CellRendererText()
 		profile_selector.pack_start(cell_renderer, True)
 		profile_selector.add_attribute(cell_renderer, "text", 0)
-		profile_selector.set_active(config.PROFILE - 1)
 		profile_selector.connect("changed", profile_selection)
+		profile_selector.set_active(config.PROFILE - 1)
 		profile_selector.set_property("width-request", 80)
 		profile_selector.set_property("height-request", 35)
 		fixed.put(profile_selector, 160, 10)
@@ -398,6 +399,7 @@ class ParentWindow(Gtk.Window):
 		label_maker("Battery charge threshold", 10, 150, 0.0, fixed)                                                                 # Fan Profile
 
 		bct_selector = Gtk.ComboBox()
+		self.bct_selector = bct_selector
 		bct_list = Gtk.ListStore(str)
 		for bct_values in range (50, 101, 5):
 			bct_list.append([str(bct_values)])
@@ -405,19 +407,149 @@ class ParentWindow(Gtk.Window):
 		bct_renderer = Gtk.CellRendererText()
 		bct_selector.pack_start(bct_renderer, True)
 		bct_selector.add_attribute(bct_renderer, "text", 0)
+		bct_selector.connect("changed", bct_selection)
 		model = bct_selector.get_model()
 		for index, row in enumerate(model):
 			if row[0] == str(config.BATTERY_THRESHOLD_VALUE):
 				bct_selector.set_active(index)
 				break
-		bct_selector.connect("changed", bct_selection)
 		bct_selector.set_property("width-request", 80)
 		bct_selector.set_property("height-request", 35)
 		fixed.put(bct_selector, 200, 150)
 		fixed.add(bct_selector)
 
+		self.pin_to_tray_check = Gtk.CheckButton(label="Pin to taskbar on close")
+		self.pin_to_tray_check.set_active(getattr(config, 'PIN_TO_TRAY', True))
+		self.pin_to_tray_check.connect("toggled", self.on_pin_to_tray_toggled)
+		fixed.put(self.pin_to_tray_check, 10, 190)
+		fixed.add(self.pin_to_tray_check)
+
+		self.connect("delete-event", self.on_delete_event)
+
+	def on_pin_to_tray_toggled(self, checkbutton):
+		config.PIN_TO_TRAY = checkbutton.get_active()
+		config_writer()
+
+	def on_delete_event(self, widget, event):
+		if getattr(config, 'PIN_TO_TRAY', True):
+			self.hide()
+			return True
+		else:
+			Gtk.main_quit()
+			return False
+
+# Try importing AppIndicator or AyatanaAppIndicator
+AppIndicator = None
+try:
+	gi.require_version('AyatanaAppIndicator3', '0.1')
+	from gi.repository import AyatanaAppIndicator3 as AppIndicator
+except (ValueError, ImportError):
+	try:
+		gi.require_version('AppIndicator3', '0.1')
+		from gi.repository import AppIndicator3 as AppIndicator
+	except (ValueError, ImportError):
+		pass
+
+def toggle_window(window):
+	if window.get_visible():
+		window.hide()
+	else:
+		window.show_all()
+		window.present()
+
+def select_profile_from_tray(window, idx):
+	window.profile_selector.set_active(idx)
+
+def select_battery_from_tray(window, val):
+	model = window.bct_selector.get_model()
+	for index, row in enumerate(model):
+		if row[0] == str(val):
+			window.bct_selector.set_active(index)
+			break
+
+def build_tray_menu(window):
+	menu = Gtk.Menu()
+
+	# Show/Hide GUI Item
+	toggle_item = Gtk.MenuItem(label="Show/Hide GUI")
+	toggle_item.connect("activate", lambda w: toggle_window(window))
+	menu.append(toggle_item)
+
+	menu.append(Gtk.SeparatorMenuItem())
+
+	# Cooling Methods submenu
+	cooling_menu = Gtk.Menu()
+	cooling_item = Gtk.MenuItem(label="Cooling Methods")
+	cooling_item.set_submenu(cooling_menu)
+	
+	profiles = ["Auto", "Basic", "Advanced", "Cooler Booster"]
+	for i, profile_name in enumerate(profiles):
+		item = Gtk.MenuItem(label=profile_name)
+		item.connect("activate", lambda w, idx=i: select_profile_from_tray(window, idx))
+		cooling_menu.append(item)
+	
+	menu.append(cooling_item)
+
+	# Battery Threshold submenu
+	battery_menu = Gtk.Menu()
+	battery_item = Gtk.MenuItem(label="Battery Threshold")
+	battery_item.set_submenu(battery_menu)
+
+	for val in range(50, 101, 5):
+		item = Gtk.MenuItem(label=f"{val}%")
+		item.connect("activate", lambda w, v=val: select_battery_from_tray(window, v))
+		battery_menu.append(item)
+
+	menu.append(battery_item)
+
+	menu.append(Gtk.SeparatorMenuItem())
+
+	# Exit Item
+	exit_item = Gtk.MenuItem(label="Exit")
+	exit_item.connect("activate", lambda w: Gtk.main_quit())
+	menu.append(exit_item)
+
+	menu.show_all()
+	return menu
+
+class OFCTrayIcon:
+	def __init__(self, window):
+		self.window = window
+		self.menu = build_tray_menu(window)
+		
+		self.use_statusicon = True
+		if AppIndicator is not None:
+			try:
+				self.indicator = AppIndicator.Indicator.new(
+					"openfreezecenter-indicator",
+					"system-run",
+					AppIndicator.IndicatorCategory.APPLICATION_STATUS
+				)
+				self.indicator.set_status(AppIndicator.IndicatorStatus.ACTIVE)
+				self.indicator.set_menu(self.menu)
+				self.use_statusicon = False
+			except Exception as e:
+				print(f"Failed to initialize AppIndicator: {e}. Falling back to Gtk.StatusIcon.")
+		
+		if self.use_statusicon:
+			try:
+				self.statusicon = Gtk.StatusIcon()
+				self.statusicon.set_from_icon_name("system-run")
+				self.statusicon.set_tooltip_text("Open Freeze Center")
+				self.statusicon.connect("activate", self.on_statusicon_activate)
+				self.statusicon.connect("popup-menu", self.on_statusicon_popup_menu)
+			except Exception as e:
+				print(f"Failed to initialize Gtk.StatusIcon: {e}. Tray icon will not be available.")
+
+	def on_statusicon_activate(self, icon):
+		toggle_window(self.window)
+
+	def on_statusicon_popup_menu(self, icon, button, time):
+		self.menu.popup(None, None, Gtk.StatusIcon.position_menu, icon, button, time)
+
 parent_window = ParentWindow()
 parent_window.connect("destroy", Gtk.main_quit)
+tray_icon = OFCTrayIcon(parent_window)
 parent_window.show_all()
 Gtk.main()
 
