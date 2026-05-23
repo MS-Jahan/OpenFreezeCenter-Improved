@@ -168,12 +168,18 @@ def profile_selection(combobox):
 		config_writer()
 		fan_profile(4, [config.COOLER_BOOSTER_OFF_ON_VALUES[0], config.COOLER_BOOSTER_OFF_ON_VALUES[2]])
 
+	if 'tray_icon' in globals() and tray_icon is not None:
+		tray_icon.rebuild_menu()
+
 def bct_selection(combobox):
 	model = combobox.get_model()
 	active_iter = combobox.get_active_iter()
 	config.BATTERY_THRESHOLD_VALUE = int(model[active_iter][0])
 	write(0xe4, config.BATTERY_THRESHOLD_VALUE + 128)
 	config_writer()
+
+	if 'tray_icon' in globals() and tray_icon is not None:
+		tray_icon.rebuild_menu()
 
 def label_maker(text, x, y, offset, fixed):
 	LABEL = Gtk.Label()
@@ -396,7 +402,7 @@ class ParentWindow(Gtk.Window):
 
 		timer_id = GLib.timeout_add(500, update_label)
 
-		label_maker("Battery charge threshold", 10, 150, 0.0, fixed)                                                                 # Fan Profile
+		label_maker("Battery charge threshold ", 10, 150, 0.0, fixed)                                                                 # Fan Profile
 
 		bct_selector = Gtk.ComboBox()
 		self.bct_selector = bct_selector
@@ -415,7 +421,7 @@ class ParentWindow(Gtk.Window):
 				break
 		bct_selector.set_property("width-request", 80)
 		bct_selector.set_property("height-request", 35)
-		fixed.put(bct_selector, 200, 150)
+		fixed.put(bct_selector, 210, 150)
 		fixed.add(bct_selector)
 
 		self.pin_to_tray_check = Gtk.CheckButton(label="Pin to taskbar on close")
@@ -467,6 +473,14 @@ def select_battery_from_tray(window, val):
 			window.bct_selector.set_active(index)
 			break
 
+def on_profile_selected(window, idx, widget):
+	if widget.get_active():
+		select_profile_from_tray(window, idx)
+
+def on_battery_selected(window, val, widget):
+	if widget.get_active():
+		select_battery_from_tray(window, val)
+
 def build_tray_menu(window):
 	menu = Gtk.Menu()
 
@@ -483,9 +497,14 @@ def build_tray_menu(window):
 	cooling_item.set_submenu(cooling_menu)
 	
 	profiles = ["Auto", "Basic", "Advanced", "Cooler Booster"]
+	cooling_group = None
 	for i, profile_name in enumerate(profiles):
-		item = Gtk.MenuItem(label=profile_name)
-		item.connect("activate", lambda w, idx=i: select_profile_from_tray(window, idx))
+		item = Gtk.RadioMenuItem.new_with_label(cooling_group, profile_name)
+		if cooling_group is None:
+			cooling_group = item.get_group()
+		if i == config.PROFILE - 1:
+			item.set_active(True)
+		item.connect("activate", lambda w, idx=i: on_profile_selected(window, idx, w))
 		cooling_menu.append(item)
 	
 	menu.append(cooling_item)
@@ -495,9 +514,14 @@ def build_tray_menu(window):
 	battery_item = Gtk.MenuItem(label="Battery Threshold")
 	battery_item.set_submenu(battery_menu)
 
+	bct_group = None
 	for val in range(50, 101, 5):
-		item = Gtk.MenuItem(label=f"{val}%")
-		item.connect("activate", lambda w, v=val: select_battery_from_tray(window, v))
+		item = Gtk.RadioMenuItem.new_with_label(bct_group, f"{val}%")
+		if bct_group is None:
+			bct_group = item.get_group()
+		if val == config.BATTERY_THRESHOLD_VALUE:
+			item.set_active(True)
+		item.connect("activate", lambda w, v=val: on_battery_selected(window, v, w))
 		battery_menu.append(item)
 
 	menu.append(battery_item)
@@ -515,7 +539,7 @@ def build_tray_menu(window):
 class OFCTrayIcon:
 	def __init__(self, window):
 		self.window = window
-		self.menu = build_tray_menu(window)
+		self.rebuild_menu()
 		
 		self.use_statusicon = True
 		if AppIndicator is not None:
@@ -540,6 +564,11 @@ class OFCTrayIcon:
 				self.statusicon.connect("popup-menu", self.on_statusicon_popup_menu)
 			except Exception as e:
 				print(f"Failed to initialize Gtk.StatusIcon: {e}. Tray icon will not be available.")
+
+	def rebuild_menu(self):
+		self.menu = build_tray_menu(self.window)
+		if hasattr(self, 'indicator') and self.indicator is not None:
+			self.indicator.set_menu(self.menu)
 
 	def on_statusicon_activate(self, icon):
 		toggle_window(self.window)

@@ -6,7 +6,7 @@ This guide provides developer agents and human contributors with a comprehensive
 
 ## Project Overview
 
-**OpenFreezeCenter** is a Linux-native graphical utility designed for fan speed control, system temperature/RPM monitoring, and battery charge threshold configuration on MSI laptops (specifically tested on MSI GP76 11UG). 
+**OpenFreezeCenter** is a Linux-native graphical utility designed for fan speed control, system temperature/RPM monitoring, and battery charge threshold configuration on MSI laptops (specifically tested on MSI GP76 11UG and MSI GF63 Thin 11SC). 
 
 MSI does not provide official software for Linux. This utility bridges the gap by reading and writing to the hardware's Embedded Controller (EC) directly via the Linux kernel's debugfs interface: `/sys/kernel/debug/ec/ec0/io`.
 
